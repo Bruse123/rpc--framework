@@ -4,7 +4,7 @@ import java.io.Closeable;
 import java.net.URI;
 
 /**
- * RPC服务中心
+ * RPC服务中心，对外提供服务的接口
  * @Author: BruseLin
  * @Date: 2021/1/30 23:11
  */
@@ -31,6 +31,7 @@ public interface RpcServiceCentre extends Closeable {
     /**
      * 服务器启动RPC框架，监听接口，开始提供远程服务
      * @return 服务实例，用于程序停止的时候安全的关闭服务。
+     * @throws Exception
      */
     Closeable startServer() throws Exception;
 }
