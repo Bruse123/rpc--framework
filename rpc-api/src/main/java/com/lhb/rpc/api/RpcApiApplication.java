@@ -1,13 +1,12 @@
 package com.lhb.rpc.api;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
+/**
+ * @author BruseLin
+ */
 public class RpcApiApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(RpcApiApplication.class, args);
+
     }
 
 }
