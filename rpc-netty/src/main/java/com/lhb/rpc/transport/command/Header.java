@@ -1,9 +1,12 @@
 package com.lhb.rpc.transport.command;
 
+import lombok.Data;
+
 /**
  * 请求头
  * @author BruseLin
  */
+@Data
 public class Header {
 
     /**
