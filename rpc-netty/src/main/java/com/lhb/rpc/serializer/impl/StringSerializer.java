@@ -1,5 +1,6 @@
 package com.lhb.rpc.serializer.impl;
 
+import com.lhb.rpc.api.spi.Singleton;
 import com.lhb.rpc.serializer.Serializer;
 
 import java.nio.charset.StandardCharsets;
@@ -9,6 +10,7 @@ import java.nio.charset.StandardCharsets;
  *
  * @author BruseLin
  */
+@Singleton
 public class StringSerializer implements Serializer<String> {
     @Override
     public byte type() {
