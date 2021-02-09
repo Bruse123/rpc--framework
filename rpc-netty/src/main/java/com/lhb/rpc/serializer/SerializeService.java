@@ -1,6 +1,6 @@
 package com.lhb.rpc.serializer;
 
-import com.lhb.rpc.api.spi.SpiService;
+import com.lhb.rpc.spi.SpiLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,10 +35,10 @@ public class SerializeService {
 
     static {
         //初始化时加载所有序列化实现类
-        for (Serializer serializer : SpiService.loadAll(Serializer.class)) {
-            registry(serializer.type(), serializer);
+        for (Serializer serializer : SpiLoader.loadAllService(Serializer.class)) {
+            registry(serializer.serializerCode(), serializer);
             logger.info("registry serializer, class: {}, type: {}.",
-                    serializer.getSerializeClass().getCanonicalName(), serializer.type());
+                    serializer.getSerializeClass().getCanonicalName(), serializer.serializerCode());
         }
     }
 
@@ -111,8 +111,9 @@ public class SerializeService {
 
     /**
      * 序列化对象
+     *
      * @param entry 所需序列化的对象
-     * @param <E> 所需序列化的对象类型
+     * @param <E>   所需序列化的对象类型
      * @return 序列化后的字节数组
      */
     public static <E> byte[] serialize(E entry) {

@@ -12,7 +12,7 @@ public interface Serializer<T> {
      * 用一个字节标识对象类型，每种类型的数据应该具有不同的类型值
      * @return byte
      */
-    byte type();
+    byte serializerCode();
 
     /**
      * 计算序列化后的数据长度，用于申请存放序列化后数据的字节数组

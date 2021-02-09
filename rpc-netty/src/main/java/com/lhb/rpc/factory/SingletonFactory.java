@@ -14,7 +14,7 @@ public class SingletonFactory {
     /**
      * 单例集合
      */
-    private final static Map<String, Object> singleMap = new HashMap<>();
+    private final static Map<String, Object> SINGLE_MAP = new HashMap<>();
 
     private SingletonFactory() {
 
@@ -24,7 +24,7 @@ public class SingletonFactory {
         String key = tClass.toString();
         Object instance;
         synchronized (SingletonFactory.class) {
-            instance = singleMap.get(key);
+            instance = SINGLE_MAP.get(key);
             if (instance == null) {
                 try {
                     instance = tClass.getDeclaredConstructor().newInstance();
