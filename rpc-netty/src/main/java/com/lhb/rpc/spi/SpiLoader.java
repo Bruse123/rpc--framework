@@ -13,6 +13,7 @@ import java.util.stream.StreamSupport;
  *
  * @author BruseLin
  */
+@SuppressWarnings("unchecked")
 public class SpiLoader<T> {
 
     private final static String SERVICE_DIRECTORY = "META-INF/services/";
@@ -26,12 +27,23 @@ public class SpiLoader<T> {
      */
     private final Class<?> classType;
 
+    /**
+     * spi加载器
+     */
     private final static Map<Class<?>, SpiLoader<?>> SPI_LOADER_MAP = new ConcurrentHashMap<>();
+
+    private final Map<Class<?>, Object> INSTANCES = new ConcurrentHashMap<>();
+
 
     private SpiLoader(Class<?> classType) {
         this.classType = classType;
     }
 
+    /**
+     * 根据接口类获取spi加载器
+     *
+     * @param classType 服务的接口类对象
+     */
     public static <S> SpiLoader<S> getSpiLoader(Class<S> classType) {
         if (classType == null) {
             throw new IllegalArgumentException("load spiService type should not be null.");
@@ -52,12 +64,27 @@ public class SpiLoader<T> {
     }
 
     /**
-     * 获取spi拓展的实例对象
+     * 根据具体的实现类对象获取spi拓展的实例对象
+     *
+     * @param type 具体服务的类对象
      * @return 实例对象
      */
-    public T getService(String name){
-
-        return null;
+    public T getService(Class<?> type) {
+        if (type == null) {
+            throw new IllegalArgumentException("Extension Service Class should not be null or empty.");
+        }
+        Object instance = INSTANCES.get(type);
+        if (instance == null) {
+            Collection<?> services = loadAllService(this.classType);
+            for (Object service : services) {
+                INSTANCES.put(service.getClass(), service);
+            }
+        }
+        instance = INSTANCES.get(type);
+        if (instance == null) {
+            throw new IllegalArgumentException("Extension Service in NETA-INF/services is not exist, SPI could not load.");
+        }
+        return (T) instance;
     }
 
     /**

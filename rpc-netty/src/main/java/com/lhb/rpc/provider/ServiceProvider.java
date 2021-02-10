@@ -1,5 +1,7 @@
 package com.lhb.rpc.provider;
 
+import com.lhb.rpc.service.RpcServiceProperties;
+
 /**
  *
  * @author BruseLin
@@ -9,14 +11,14 @@ public interface ServiceProvider {
     /**
      * 发布服务
      * @param service 服务对象
-     * @param serviceName 服务名称
+     * @param rpcServiceProperties 服务对象的相关属性
      */
-void publishService(Object service, String serviceName);
+void publishService(Object service, RpcServiceProperties rpcServiceProperties);
 
     /**
      * 根据服务名称获取服务
-     * @param serviceName 服务名称
+     * @param rpcServiceProperties 服务对象的相关属性
      */
-void getService(String serviceName);
+void getService(RpcServiceProperties rpcServiceProperties);
 
 }

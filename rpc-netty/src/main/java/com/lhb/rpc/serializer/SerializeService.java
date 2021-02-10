@@ -12,6 +12,7 @@ import java.util.Map;
  *
  * @author BruseLin
  */
+@SuppressWarnings("unchecked")
 public class SerializeService {
     private static final Logger logger = LoggerFactory.getLogger(SerializeService.class);
     /**

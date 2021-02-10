@@ -1,7 +1,6 @@
 package com.lhb.rpc.serializer.impl;
 
-import com.lhb.rpc.client.stubs.Metadata;
-import com.lhb.rpc.client.stubs.RpcRequest;
+import com.lhb.rpc.transport.command.request.RpcRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -17,10 +16,6 @@ public enum SerializerType {
      * {@link String}对象类型
      */
     STRING_TYPE((byte) 0x01, "String"),
-    /**
-     * {@link Metadata} 对象类型
-     */
-    METADATA_TYPE((byte) 0x02, "Metadata"),
     /**
      * {@link RpcRequest} 对象类型
      */

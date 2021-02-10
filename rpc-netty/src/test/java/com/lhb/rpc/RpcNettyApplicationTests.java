@@ -6,7 +6,8 @@ import org.junit.jupiter.api.Test;
 class RpcNettyApplicationTests {
 
     @Test
-    void contextLoads() {
+    void test() {
+
     }
 
 }

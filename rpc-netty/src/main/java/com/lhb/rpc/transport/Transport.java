@@ -1,5 +1,6 @@
 package com.lhb.rpc.transport;
 
+import com.lhb.rpc.spi.Spi;
 import com.lhb.rpc.transport.command.Command;
 
 import java.util.concurrent.CompletableFuture;
@@ -8,6 +9,7 @@ import java.util.concurrent.CompletableFuture;
  * 通信接口
  * @author BruseLin
  */
+@Spi
 public interface Transport {
 
     /**
