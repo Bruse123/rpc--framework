@@ -1,4 +1,4 @@
-package com.lhb.rpc.serializer;
+package com.lhb.rpc.exception;
 
 /**
  * @author BruseLin

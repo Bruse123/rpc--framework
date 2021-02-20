@@ -1,7 +1,8 @@
 package com.lhb.rpc.transport;
 
 import com.lhb.rpc.spi.Spi;
-import com.lhb.rpc.transport.command.Command;
+import com.lhb.rpc.transport.command.request.RpcRequest;
+import com.lhb.rpc.transport.command.response.Response;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -17,5 +18,5 @@ public interface Transport {
      * @param request 请求信息
      * @return 响应结果
      */
-    CompletableFuture<Command> send(Command request);
+    CompletableFuture<Response<Object>> send(RpcRequest request);
 }

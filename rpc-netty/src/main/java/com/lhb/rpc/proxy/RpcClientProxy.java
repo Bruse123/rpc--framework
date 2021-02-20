@@ -1,12 +1,16 @@
 package com.lhb.rpc.proxy;
 
 import com.lhb.rpc.service.RpcServiceProperties;
+import com.lhb.rpc.transport.command.request.RpcRequest;
+import com.lhb.rpc.transport.command.response.Response;
 import com.lhb.rpc.transport.netty.NettyTransport;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @Author BruseLin
@@ -48,8 +52,15 @@ public class RpcClientProxy implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         log.info("proxy class-[{}] invoked method: [{}]", proxy.getClass().getSimpleName(), method.getName());
-
-
-        return null;
+        RpcRequest rpcRequest = RpcRequest.builder()
+                .serviceName(rpcServiceProperties.toRpcServiceName())
+                .methodName(method.getName())
+                .paramTypes(method.getParameterTypes())
+                .arguments(method.getParameters())
+                .requestId(UUID.randomUUID().toString())
+                .build();
+        Response<Object> response = null;
+        CompletableFuture<Response<Object>> future = nettyTransport.send(rpcRequest);
+        return response.getData();
     }
 }

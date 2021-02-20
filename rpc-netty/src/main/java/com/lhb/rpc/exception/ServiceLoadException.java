@@ -1,4 +1,4 @@
-package com.lhb.rpc.spi;
+package com.lhb.rpc.exception;
 
 
 /**

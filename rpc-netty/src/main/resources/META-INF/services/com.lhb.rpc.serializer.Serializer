@@ -1,1 +1,1 @@
-com.lhb.rpc.serializer.impl.StringSerializer
+com.lhb.rpc.serializer.impl.KryoSerializer

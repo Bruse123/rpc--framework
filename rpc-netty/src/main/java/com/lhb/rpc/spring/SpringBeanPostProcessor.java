@@ -32,7 +32,6 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
         this.nettyTransport = (NettyTransport) SpiLoader.getSpiLoader(Transport.class).getService(NettyTransport.class);
     }
 
-    //todo
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         if (bean.getClass().isAnnotationPresent(RpcService.class)) {
