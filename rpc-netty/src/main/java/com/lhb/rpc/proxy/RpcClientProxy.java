@@ -1,9 +1,12 @@
 package com.lhb.rpc.proxy;
 
+import com.lhb.rpc.enums.RpcErrorMsg;
+import com.lhb.rpc.enums.RpcResponseCode;
+import com.lhb.rpc.exception.RpcException;
 import com.lhb.rpc.service.RpcServiceProperties;
+import com.lhb.rpc.transport.Transport;
 import com.lhb.rpc.transport.command.request.RpcRequest;
-import com.lhb.rpc.transport.command.response.Response;
-import com.lhb.rpc.transport.netty.NettyTransport;
+import com.lhb.rpc.transport.command.response.RpcResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationHandler;
@@ -20,12 +23,12 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 public class RpcClientProxy implements InvocationHandler {
 
-    private final NettyTransport nettyTransport;
+    private final Transport transport;
 
     private final RpcServiceProperties rpcServiceProperties;
 
-    public RpcClientProxy(NettyTransport nettyTransport, RpcServiceProperties rpcServiceProperties) {
-        this.nettyTransport = nettyTransport;
+    public RpcClientProxy(Transport transport, RpcServiceProperties rpcServiceProperties) {
+        this.transport = transport;
         this.rpcServiceProperties = rpcServiceProperties;
     }
 
@@ -59,8 +62,21 @@ public class RpcClientProxy implements InvocationHandler {
                 .arguments(method.getParameters())
                 .requestId(UUID.randomUUID().toString())
                 .build();
-        Response<Object> response = null;
-        CompletableFuture<Response<Object>> future = nettyTransport.send(rpcRequest);
+        CompletableFuture<RpcResponse<Object>> future = transport.send(rpcRequest);
+        RpcResponse<Object> response = future.get();
+        check(response, rpcRequest);
         return response.getData();
+    }
+
+    private void check(RpcResponse<Object> rpcResponse, RpcRequest rpcRequest) {
+        if (rpcResponse == null) {
+            throw new RpcException(RpcErrorMsg.SERVICE_INVOCATION_FAILURE, rpcRequest.getServiceName());
+        }
+        if (!rpcRequest.getRequestId().equals(rpcResponse.getRequestId())) {
+            throw new RpcException(RpcErrorMsg.REQUEST_NOT_MATCH_RESPONSE, rpcRequest.getServiceName());
+        }
+        if (rpcResponse.getResponseCode() == null || !rpcResponse.getResponseCode().equals(RpcResponseCode.SUCCESS.getCode())) {
+            throw new RpcException(RpcErrorMsg.SERVICE_INVOCATION_FAILURE, rpcRequest.getServiceName());
+        }
     }
 }

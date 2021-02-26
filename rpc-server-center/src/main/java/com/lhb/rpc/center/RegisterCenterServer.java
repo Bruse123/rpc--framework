@@ -1,8 +1,6 @@
-package com.lhb.rpc.transport.netty.server;
+package com.lhb.rpc.center;
 
-import com.lhb.rpc.factory.SingletonFactory;
-import com.lhb.rpc.provider.ServiceProvider;
-import com.lhb.rpc.provider.ServiceProviderImpl;
+import com.lhb.rpc.center.handler.RegisterCenterHandler;
 import com.lhb.rpc.transport.netty.codec.RpcMessageDecoder;
 import com.lhb.rpc.transport.netty.codec.RpcMessageEncoder;
 import io.netty.bootstrap.ServerBootstrap;
@@ -22,17 +20,13 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @Author BruseLin
- * @Date 2021/2/18 15:14
+ * @Date 2021/2/22 17:30
  * @Version 1.0
  */
 @Slf4j
 @Component
-public class NettyServer {
-
-    public static final int PORT = 9998;
-
-    private final ServiceProvider serviceProvider = SingletonFactory.getSingleInstance(ServiceProviderImpl.class);
-
+public class RegisterCenterServer {
+    public static final int PORT = 9999;
     @SneakyThrows
     public void start() {
         String host = InetAddress.getLocalHost().getHostAddress();
@@ -52,12 +46,12 @@ public class NettyServer {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
-                        // 30 秒之内没有收到客户端请求的话就关闭连接
+                        // 30 秒之内没有读就发送心跳包
                         ChannelPipeline p = ch.pipeline();
                         p.addLast(new IdleStateHandler(30, 0, 0, TimeUnit.SECONDS))
                                 .addLast(new RpcMessageEncoder())
                                 .addLast(new RpcMessageDecoder())
-                                .addLast(new RpcServerHandler());
+                                .addLast(new RegisterCenterHandler());
 
                     }
                 });

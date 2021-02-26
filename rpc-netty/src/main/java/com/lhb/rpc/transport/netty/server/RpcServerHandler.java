@@ -49,10 +49,10 @@ public class RpcServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("server get result [{}]", result);
                     rpcMessage.setMessageType(RpcConstants.RESPONSE_TYPE);
                     if (ctx.channel().isActive() && ctx.channel().isWritable()) {
-                        RpcResponse<Object> rpcResponse = RpcResponse.success(((RpcMessage) msg).getMessageId(), result);
+                        RpcResponse<Object> rpcResponse = RpcResponse.success(((RpcRequest) rpcRequest).getRequestId(), result);
                         rpcMessage.setData(rpcResponse);
                     } else {
-                        RpcResponse<Object> rpcResponse = RpcResponse.fail(((RpcMessage) msg).getMessageId(), null, RpcResponseCode.FALSE);
+                        RpcResponse<Object> rpcResponse = RpcResponse.fail(((RpcRequest) rpcRequest).getRequestId(), null, RpcResponseCode.FALSE);
                         rpcMessage.setData(rpcResponse);
                     }
                 }

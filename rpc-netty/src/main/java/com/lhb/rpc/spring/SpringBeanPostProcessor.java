@@ -9,7 +9,7 @@ import com.lhb.rpc.proxy.RpcClientProxy;
 import com.lhb.rpc.service.RpcServiceProperties;
 import com.lhb.rpc.spi.SpiLoader;
 import com.lhb.rpc.transport.Transport;
-import com.lhb.rpc.transport.netty.NettyTransport;
+import com.lhb.rpc.transport.netty.client.NettyClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -25,11 +25,11 @@ import java.lang.reflect.Field;
 public class SpringBeanPostProcessor implements BeanPostProcessor {
 
     private final ServiceProvider SERVICE_PROVIDER;
-    private final NettyTransport nettyTransport;
+    private final Transport transport;
 
     public SpringBeanPostProcessor() {
         this.SERVICE_PROVIDER = SingletonFactory.getSingleInstance(ServiceProviderImpl.class);
-        this.nettyTransport = (NettyTransport) SpiLoader.getSpiLoader(Transport.class).getService(NettyTransport.class);
+        this.transport = SpiLoader.getSpiLoader(Transport.class).getService(NettyClient.class);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
                 //为该bean对象中添加@RpcReference注解的属性生成代理对象
                 String serviceName = rpcReference.ServiceName();
                 RpcServiceProperties rpcServiceProperties = RpcServiceProperties.builder().serviceName(serviceName).build();
-                RpcClientProxy rpcClientProxy = new RpcClientProxy(nettyTransport, rpcServiceProperties);
+                RpcClientProxy rpcClientProxy = new RpcClientProxy(transport, rpcServiceProperties);
                 Object proxy = rpcClientProxy.getProxy(declaredField.getType());
                 declaredField.setAccessible(true);
                 try {

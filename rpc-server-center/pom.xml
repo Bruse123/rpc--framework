@@ -11,5 +11,13 @@
 
     <artifactId>rpc-server-center</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.lhb.rpc</groupId>
+            <artifactId>rpc-netty</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
 
 </project>

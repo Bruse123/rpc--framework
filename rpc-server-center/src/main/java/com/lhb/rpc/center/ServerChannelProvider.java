@@ -1,4 +1,4 @@
-package com.lhb.rpc.transport.netty;
+package com.lhb.rpc.center;
 
 import io.netty.channel.Channel;
 
@@ -8,17 +8,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Author BruseLin
- * @Date 2021/2/9 10:57
+ * @Date 2021/2/23 14:31
  * @Version 1.0
  */
-public class ChannelProvider {
+public class ServerChannelProvider {
+
     private final Map<String, Channel> channelMap;
 
-    public ChannelProvider() {
-        this.channelMap = new ConcurrentHashMap<>();
+    public ServerChannelProvider() {
+        channelMap = new ConcurrentHashMap<>();
     }
 
-    public Channel getChannel(InetSocketAddress inetSocketAddress) {
+    public Channel get(InetSocketAddress inetSocketAddress) {
         String key = inetSocketAddress.toString();
         if (channelMap.containsKey(key)) {
             Channel channel = channelMap.get(key);
@@ -31,13 +32,8 @@ public class ChannelProvider {
         return null;
     }
 
-    public void setChannel(InetSocketAddress inetSocketAddress, Channel channel) {
-        String key = inetSocketAddress.toString();
-        channelMap.put(key, channel);
+    public void put(Channel channel, InetSocketAddress inetSocketAddress) {
+        channelMap.put(inetSocketAddress.toString(), channel);
     }
 
-    public void removeChannel(InetSocketAddress inetSocketAddress) {
-        String key = inetSocketAddress.toString();
-        channelMap.remove(key);
-    }
 }

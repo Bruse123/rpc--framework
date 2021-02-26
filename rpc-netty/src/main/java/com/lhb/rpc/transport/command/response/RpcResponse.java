@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 public class RpcResponse<T> {
 
-    private Integer requestId;
+    private String requestId;
 
     private Integer responseCode;
 
@@ -21,7 +21,7 @@ public class RpcResponse<T> {
 
     private T data;
 
-    public static <T> RpcResponse<T> success(Integer requestId, T data) {
+    public static <T> RpcResponse<T> success(String requestId, T data) {
         RpcResponse<T> response = new RpcResponse<>();
         response.setRequestId(requestId);
         response.setResponseCode(RpcResponseCode.SUCCESS.getCode());
@@ -32,7 +32,7 @@ public class RpcResponse<T> {
         return response;
     }
 
-    public static <T> RpcResponse<T> fail(Integer requestId, T data, RpcResponseCode rpcResponseCode) {
+    public static <T> RpcResponse<T> fail(String requestId, T data, RpcResponseCode rpcResponseCode) {
         RpcResponse<T> response = new RpcResponse<>();
         response.setRequestId(requestId);
         response.setResponseCode(rpcResponseCode.getCode());
