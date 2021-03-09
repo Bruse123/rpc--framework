@@ -1,8 +1,12 @@
 package com.lhb.rpc.transport.netty.client;
 
+import com.lhb.rpc.enums.RpcErrorMsg;
+import com.lhb.rpc.enums.RpcResponseCode;
 import com.lhb.rpc.enums.SerializationType;
+import com.lhb.rpc.exception.RpcException;
 import com.lhb.rpc.factory.SingletonFactory;
 import com.lhb.rpc.register.ServiceDiscovery;
+import com.lhb.rpc.register.dto.Address;
 import com.lhb.rpc.transport.RpcConstants;
 import com.lhb.rpc.transport.Transport;
 import com.lhb.rpc.transport.command.RpcMessage;
@@ -20,7 +24,6 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
@@ -32,7 +35,6 @@ import java.util.concurrent.TimeUnit;
  * @Version 1.0
  */
 @Slf4j
-@Component
 public class NettyClient implements Transport {
 
     private final ServiceDiscovery serviceDiscovery;
@@ -71,7 +73,14 @@ public class NettyClient implements Transport {
     public CompletableFuture<RpcResponse<Object>> send(RpcRequest request) {
         CompletableFuture<RpcResponse<Object>> responseFuture = new CompletableFuture<>();
         String serviceName = request.getServiceName();
-        InetSocketAddress inetSocketAddress = (InetSocketAddress) serviceDiscovery.lookupService(serviceName);
+        @SuppressWarnings("unchecked")
+        RpcResponse<Object> response = (RpcResponse<Object>) serviceDiscovery.lookupService(serviceName);
+        //返回失败
+        if(response.getResponseCode() != RpcResponseCode.SUCCESS.getCode()){
+            throw new RpcException((RpcErrorMsg) response.getData());
+        }
+        Address address  = (Address) response.getData();
+        InetSocketAddress inetSocketAddress = new InetSocketAddress(address.getIp(), address.getPort());
         Channel channel = getChannel(inetSocketAddress);
         if (channel.isActive()) {
             unProcessedRequests.putRequest(request.getRequestId(), responseFuture);

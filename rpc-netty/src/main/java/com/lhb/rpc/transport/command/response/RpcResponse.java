@@ -3,6 +3,7 @@ package com.lhb.rpc.transport.command.response;
 import com.lhb.rpc.enums.RpcResponseCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 响应信息
@@ -11,6 +12,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@ToString
 public class RpcResponse<T> {
 
     private String requestId;
@@ -42,5 +44,6 @@ public class RpcResponse<T> {
         }
         return response;
     }
+
 
 }

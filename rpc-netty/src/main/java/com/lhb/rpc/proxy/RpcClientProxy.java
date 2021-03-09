@@ -59,13 +59,18 @@ public class RpcClientProxy implements InvocationHandler {
                 .serviceName(rpcServiceProperties.toRpcServiceName())
                 .methodName(method.getName())
                 .paramTypes(method.getParameterTypes())
-                .arguments(method.getParameters())
+                .arguments(args)
                 .requestId(UUID.randomUUID().toString())
                 .build();
-        CompletableFuture<RpcResponse<Object>> future = transport.send(rpcRequest);
-        RpcResponse<Object> response = future.get();
-        check(response, rpcRequest);
-        return response.getData();
+        try {
+            CompletableFuture<RpcResponse<Object>> future = transport.send(rpcRequest);
+            RpcResponse<Object> response = future.get();
+            check(response, rpcRequest);
+            return response.getData();
+        } catch (RpcException e) {
+            log.info(e.getMessage());
+        }
+        return null;
     }
 
     private void check(RpcResponse<Object> rpcResponse, RpcRequest rpcRequest) {

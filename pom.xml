@@ -7,7 +7,7 @@
     <artifactId>rpc-framework</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>rpc-framework</name>
-    <description>a simple rpc framework</description>
+    <description>a simple com.lhb.rpc framework</description>
     <packaging>pom</packaging>
 
     <parent>
@@ -21,6 +21,8 @@
         <module>rpc-api</module>
         <module>rpc-netty</module>
         <module>rpc-server-center</module>
+        <module>demo-client</module>
+        <module>demo-server</module>
     </modules>
 
     <properties>

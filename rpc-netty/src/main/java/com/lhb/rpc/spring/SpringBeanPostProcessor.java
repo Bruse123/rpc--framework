@@ -34,6 +34,7 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println("postProcessBefore：" + beanName);
         if (bean.getClass().isAnnotationPresent(RpcService.class)) {
             log.info("found RpcService  [{}]", bean.getClass().getName());
             RpcService rpcService = bean.getClass().getAnnotation(RpcService.class);
@@ -45,6 +46,7 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println("postProcessAfter：" + beanName);
         Class<?> beanClass = bean.getClass();
         Field[] declaredFields = beanClass.getDeclaredFields();
         for (Field declaredField : declaredFields) {

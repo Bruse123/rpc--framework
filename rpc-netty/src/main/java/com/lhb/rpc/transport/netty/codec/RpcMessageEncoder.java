@@ -58,7 +58,7 @@ public class RpcMessageEncoder extends MessageToByteEncoder<RpcMessage> {
             }
             int writerIndex = out.writerIndex();
             //调整buffer的写下标到消息长度的起始下标
-            out.writerIndex(writerIndex - fullLength + RpcConstants.HEAD_LENGTH - RpcConstants.LENGTH_FIELD_LENGTH);
+            out.writerIndex(writerIndex - fullLength + RpcConstants.HEAD_LENGTH - RpcConstants.LENGTH_FIELD_LENGTH - 1);
             out.writeInt(fullLength);
             out.writerIndex(writerIndex);
         } catch (Exception e) {

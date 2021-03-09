@@ -1,4 +1,4 @@
 # rpc-framework
-a simple rpc framework
+a simple com.lhb.rpc framework
 
-单机，没有实现统一的注册中心，多服务无法同步。
+消息id未同步，优化消息id

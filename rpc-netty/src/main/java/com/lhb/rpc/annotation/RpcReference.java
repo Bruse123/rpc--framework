@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 /**
  * @author BruseLin
  */
-@Target({ElementType.TYPE})
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented

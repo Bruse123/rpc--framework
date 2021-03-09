@@ -3,8 +3,7 @@ package com.lhb.rpc.register.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.net.InetSocketAddress;
+import lombok.ToString;
 
 /**
  * @Author BruseLin
@@ -14,8 +13,20 @@ import java.net.InetSocketAddress;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class RegisterDto {
+    /**
+     * 请求id
+     */
     private String requestId;
+
+    /**
+     * 服务名称
+     */
     private String serviceName;
-    private InetSocketAddress inetSocketAddress;
+
+    /**
+     * 服务地址
+     */
+    private Address address;
 }

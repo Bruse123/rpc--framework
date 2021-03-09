@@ -63,6 +63,7 @@ public class NettyServer {
                 });
         // 绑定端口，同步等待绑定成功
         ChannelFuture future = serverBootstrap.bind(host, PORT).sync();
+        log.info("启动服务成功，IP：{}，PORT{}", host, PORT);
         // 同步等待服务端监听端口关闭
         future.channel().closeFuture().sync();
     }

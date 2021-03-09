@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RegisterCenterServer {
     public static final int PORT = 9999;
+
     @SneakyThrows
     public void start() {
         String host = InetAddress.getLocalHost().getHostAddress();
@@ -57,6 +58,7 @@ public class RegisterCenterServer {
                 });
         // 绑定端口，同步等待绑定成功
         ChannelFuture future = serverBootstrap.bind(host, PORT).sync();
+        log.info("启动注册中心成功，IP：{}，PORT：{}", host, PORT);
         // 同步等待服务端监听端口关闭
         future.channel().closeFuture().sync();
     }

@@ -33,24 +33,34 @@ public class RpcConstants {
     public static final byte RESPONSE_TYPE = 2;
 
     /**
-     * 服务注册类型
+     * 服务注册请求类型
      */
-    public static final byte REGISTER_TYPE = 3;
+    public static final byte REGISTER_REQUEST_TYPE = 11;
 
     /**
-     * 服务发现类型
+     * 服务注册响应类型
      */
-    public static final byte DISCOVERY_TYPE = 4;
+    public static final byte REGISTER_RESPONSE_TYPE = 12;
+
+    /**
+     * 服务发现请求类型
+     */
+    public static final byte DISCOVERY_REQUEST_TYPE = 13;
+
+    /**
+     * 服务发现响应类型
+     */
+    public static final byte DISCOVERY_RESPONSE_TYPE = 14;
 
     /**
      * 心跳请求类型
      */
-    public static final byte HEARTBEAT_REQUEST_TYPE = 5;
+    public static final byte HEARTBEAT_REQUEST_TYPE = 21;
 
     /**
      * 心跳响应类型
      */
-    public static final byte HEARTBEAT_RESPONSE_TYPE = 6;
+    public static final byte HEARTBEAT_RESPONSE_TYPE = 22;
 
     /**
      * 心跳请求内容

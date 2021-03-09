@@ -3,7 +3,6 @@ package com.lhb.rpc.register.handler;
 import com.lhb.rpc.enums.SerializationType;
 import com.lhb.rpc.factory.SingletonFactory;
 import com.lhb.rpc.register.client.ServiceClient;
-import com.lhb.rpc.register.dto.Command;
 import com.lhb.rpc.transport.RpcConstants;
 import com.lhb.rpc.transport.command.RpcMessage;
 import com.lhb.rpc.transport.command.response.RpcResponse;
@@ -16,6 +15,8 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Date;
 
 /**
  * @Author BruseLin
@@ -38,22 +39,23 @@ public class RegisterHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         try {
             log.info("registerClient receive msg [{}]", msg);
-            if(msg instanceof Command){
-                @SuppressWarnings("unchecked")
-                Command<Object> command = (Command<Object>) msg;
-
-            }else if (msg instanceof RpcMessage) {
+            if (msg instanceof RpcMessage) {
                 RpcMessage rpcMessage = (RpcMessage) msg;
                 byte messageType = rpcMessage.getMessageType();
-                if (messageType == RpcConstants.HEARTBEAT_RESPONSE_TYPE) {
+                if (messageType == RpcConstants.HEARTBEAT_REQUEST_TYPE) {
                     log.info("heart [{}]", rpcMessage.getData());
-                } else if (messageType == RpcConstants.RESPONSE_TYPE) {
+                    rpcMessage.setMessageType(RpcConstants.HEARTBEAT_RESPONSE_TYPE);
+                    rpcMessage.setData(RpcConstants.PONG);
+                    ctx.writeAndFlush(rpcMessage).addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
+                } else if (messageType == RpcConstants.HEARTBEAT_RESPONSE_TYPE) {
+                    log.info("heart [{}]", rpcMessage.getData());
+                } else {
                     @SuppressWarnings("unchecked")
                     RpcResponse<Object> response = (RpcResponse<Object>) rpcMessage.getData();
                     unProcessedRequests.complete(response);
                 }
             }
-        }finally {
+        } finally {
             ReferenceCountUtil.release(msg);
         }
     }
@@ -63,7 +65,7 @@ public class RegisterHandler extends ChannelInboundHandlerAdapter {
         if (evt instanceof IdleStateEvent) {
             IdleState state = ((IdleStateEvent) evt).state();
             if (state == IdleState.WRITER_IDLE) {
-                log.info("register write trigger [{}]", ctx.channel().localAddress());
+                log.info("[{}] register write trigger [{}]",new Date(), ctx.channel().localAddress());
 
                 RpcMessage rpcMessage = RpcMessage.builder().transportVersion(RpcConstants.TRANSPORT_VERSION)
                         .serializerCodec(SerializationType.KRYO.getCode())

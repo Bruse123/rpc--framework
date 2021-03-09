@@ -28,6 +28,7 @@ public class SingletonFactory {
             if (instance == null) {
                 try {
                     instance = tClass.getDeclaredConstructor().newInstance();
+                    SINGLE_MAP.put(key, instance);
                 } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
                     throw new RuntimeException(e.getMessage(), e);
                 }

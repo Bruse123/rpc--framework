@@ -36,4 +36,9 @@ public class ServerChannelProvider {
         channelMap.put(inetSocketAddress.toString(), channel);
     }
 
+    public void remove(InetSocketAddress inetSocketAddress){
+        String key = inetSocketAddress.toString();
+        channelMap.remove(key);
+    }
+
 }

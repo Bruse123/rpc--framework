@@ -2,7 +2,8 @@ package com.lhb.rpc.register.client;
 
 import com.lhb.rpc.enums.SerializationType;
 import com.lhb.rpc.factory.SingletonFactory;
-import com.lhb.rpc.register.dto.Command;
+import com.lhb.rpc.register.dto.DiscoveryDto;
+import com.lhb.rpc.register.dto.RegisterDto;
 import com.lhb.rpc.register.handler.RegisterHandler;
 import com.lhb.rpc.transport.RpcConstants;
 import com.lhb.rpc.transport.command.RpcMessage;
@@ -17,15 +18,11 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import io.netty.handler.timeout.IdleStateHandler;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @Author BruseLin
@@ -33,7 +30,6 @@ import java.util.concurrent.TimeUnit;
  * @Version 1.0
  */
 @Slf4j
-@Component
 public class ServiceClient {
 
     private final UnProcessedRequests unProcessedRequests;
@@ -43,10 +39,8 @@ public class ServiceClient {
     private final Bootstrap bootstrap;
 
     private Channel channel;
-    @Value("${registerCenter.ip}")
-    private String registerCenterIp;
-    @Value("${registerCenter.port}")
-    private int registerCenterPort;
+    private static String registerCenterIp = "11.12.2.50";
+    private static int registerCenterPort = 9999;
 
     public ServiceClient() {
         this.nioEventLoopGroup = new NioEventLoopGroup();
@@ -60,8 +54,8 @@ public class ServiceClient {
                     protected void initChannel(SocketChannel ch) {
                         ChannelPipeline pipeline = ch.pipeline();
                         // 30 秒之内没有写就发送心跳包
-                        pipeline.addLast(new IdleStateHandler(0, 30, 0, TimeUnit.SECONDS))
-                                .addLast(new RpcMessageEncoder())
+                        //pipeline.addLast(new IdleStateHandler(0, 30, 0, TimeUnit.SECONDS))
+                        pipeline.addLast(new RpcMessageEncoder())
                                 .addLast(new RpcMessageDecoder())
                                 .addLast(new RegisterHandler());
                     }
@@ -71,9 +65,11 @@ public class ServiceClient {
 
     public CompletableFuture<RpcResponse<Object>> send(RpcMessage message) {
         CompletableFuture<RpcResponse<Object>> responseFuture = new CompletableFuture<>();
-        if (message.getMessageType() == RpcConstants.DISCOVERY_TYPE) {
-            @SuppressWarnings("unchecked")
-            Command<Object> data = (Command<Object>) message.getData();
+        if (message.getMessageType() == RpcConstants.DISCOVERY_REQUEST_TYPE) {
+            DiscoveryDto data = (DiscoveryDto) message.getData();
+            unProcessedRequests.putRequest(data.getRequestId(), responseFuture);
+        } else if (message.getMessageType() == RpcConstants.REGISTER_REQUEST_TYPE) {
+            RegisterDto data = (RegisterDto) message.getData();
             unProcessedRequests.putRequest(data.getRequestId(), responseFuture);
         }
         message.setSerializerCodec(SerializationType.KRYO.getCode());
@@ -81,9 +77,9 @@ public class ServiceClient {
         this.channel = getChannel();
         this.channel.writeAndFlush(message).addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
-                log.info("send register msg：[{}]", message);
+                log.info("send msg to registerCenter：[{}]", message);
             } else {
-                log.error("send register msg fail：", future.cause());
+                log.error("send msg to registerCenter fail：", future.cause());
                 future.channel().close();
                 responseFuture.completeExceptionally(future.cause());
             }

@@ -7,14 +7,21 @@ import lombok.ToString;
 
 /**
  * @Author BruseLin
- * @Date 2021/2/22 15:40
+ * @Date 2021/3/5 15:49
  * @Version 1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @ToString
-public class DiscoveryDto {
-    private String requestId;
-    private String serviceName;
+@AllArgsConstructor
+@NoArgsConstructor
+public class Address {
+    /**
+     * 服务IP
+     */
+    private String ip;
+
+    /**
+     * 服务端口
+     */
+    private int port;
 }

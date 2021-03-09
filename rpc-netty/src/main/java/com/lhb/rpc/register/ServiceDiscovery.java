@@ -2,7 +2,6 @@ package com.lhb.rpc.register;
 
 import com.lhb.rpc.factory.SingletonFactory;
 import com.lhb.rpc.register.client.ServiceClient;
-import com.lhb.rpc.register.dto.Command;
 import com.lhb.rpc.register.dto.DiscoveryDto;
 import com.lhb.rpc.transport.RpcConstants;
 import com.lhb.rpc.transport.command.RpcMessage;
@@ -27,14 +26,11 @@ public class ServiceDiscovery {
     @SneakyThrows
     public Object lookupService(String serviceName) {
         DiscoveryDto discoveryDto = new DiscoveryDto(UUID.randomUUID().toString(), serviceName);
-        Command<Object> command = new Command<>();
-        command.setData(discoveryDto);
         RpcMessage message = RpcMessage.builder()
-                .messageType(RpcConstants.REGISTER_TYPE)
-                .data(command)
+                .messageType(RpcConstants.DISCOVERY_REQUEST_TYPE)
+                .data(discoveryDto)
                 .build();
         CompletableFuture<RpcResponse<Object>> future = serviceRegisterClient.send(message);
-        RpcResponse<Object> rpcResponse = future.get();
-        return rpcResponse.getData();
+        return future.get();
     }
 }

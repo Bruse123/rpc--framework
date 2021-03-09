@@ -1,10 +1,13 @@
 package com.lhb.rpc.serializer;
 
+import com.lhb.rpc.spi.Spi;
+
 /**
  * 序列化接口
  *
  * @author BruseLin
  */
+@Spi
 public interface Serializer {
 
     /**

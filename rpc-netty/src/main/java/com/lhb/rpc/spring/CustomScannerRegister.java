@@ -1,6 +1,7 @@
 package com.lhb.rpc.spring;
 
 import com.lhb.rpc.annotation.RpcScan;
+import com.lhb.rpc.annotation.RpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ResourceLoaderAware;
@@ -9,6 +10,7 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.StandardAnnotationMetadata;
+import org.springframework.stereotype.Component;
 
 /**
  * @author BruseLin
@@ -17,6 +19,7 @@ import org.springframework.core.type.StandardAnnotationMetadata;
 public class CustomScannerRegister implements ImportBeanDefinitionRegistrar, ResourceLoaderAware {
 
     private final static String BASE_PACKAGE_ATTRIBUTE_NAME = "basePackage";
+    private final static String SPRING_BEAN_BASE_PACKAGE = "com.lhb.rpc.spring";
     private ResourceLoader resourceLoader;
 
     @Override
@@ -34,14 +37,18 @@ public class CustomScannerRegister implements ImportBeanDefinitionRegistrar, Res
             rpcScanBasePackages = annotationAttributes.getStringArray(BASE_PACKAGE_ATTRIBUTE_NAME);
         }
         if (rpcScanBasePackages.length == 0) {
-            //如果没有设置basePackage 扫描路径,就扫描对应包下面的值
+            //如果没有设置basePackage 扫描路径,就扫描带注解的类的包
             rpcScanBasePackages = new String[]{((StandardAnnotationMetadata) annotationMetadata).getIntrospectedClass().getPackage().getName()};
         }
-        CustomScan rpcServiceScan = new CustomScan(registry, RpcScan.class);
+        CustomScan rpcServiceScan = new CustomScan(registry, RpcService.class);
+        CustomScan springBeanScan = new CustomScan(registry, Component.class);
         if (resourceLoader != null) {
             rpcServiceScan.setResourceLoader(resourceLoader);
+            springBeanScan.setResourceLoader(resourceLoader);
         }
-        int scanCount = rpcServiceScan.scan(rpcScanBasePackages);
-        log.info("rpcServiceScanner扫描的数量 [{}]", scanCount);
+        int springBeanCount = springBeanScan.scan(SPRING_BEAN_BASE_PACKAGE);
+        log.info("springBeanScan扫描的数量 [{}]", springBeanCount);
+        int rpcServiceCount = rpcServiceScan.scan(rpcScanBasePackages);
+        log.info("rpcServiceScan扫描的数量 [{}]", rpcServiceCount);
     }
 }

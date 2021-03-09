@@ -52,8 +52,9 @@ public class RpcServerHandler extends ChannelInboundHandlerAdapter {
                         RpcResponse<Object> rpcResponse = RpcResponse.success(((RpcRequest) rpcRequest).getRequestId(), result);
                         rpcMessage.setData(rpcResponse);
                     } else {
-                        RpcResponse<Object> rpcResponse = RpcResponse.fail(((RpcRequest) rpcRequest).getRequestId(), null, RpcResponseCode.FALSE);
+                        RpcResponse<Object> rpcResponse = RpcResponse.fail(((RpcRequest) rpcRequest).getRequestId(), "not writable", RpcResponseCode.FALSE);
                         rpcMessage.setData(rpcResponse);
+                        log.error("not writable now, message dropped");
                     }
                 }
                 ctx.writeAndFlush(rpcMessage).addListener(ChannelFutureListener.CLOSE_ON_FAILURE);

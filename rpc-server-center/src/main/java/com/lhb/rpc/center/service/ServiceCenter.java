@@ -1,9 +1,11 @@
 package com.lhb.rpc.center.service;
 
+import com.lhb.rpc.register.dto.Address;
 import com.lhb.rpc.register.dto.DiscoveryDto;
 import com.lhb.rpc.register.dto.RegisterDto;
+import io.netty.channel.Channel;
 
-import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,56 +20,49 @@ public class ServiceCenter {
     /**
      * 可用的服务
      */
-    private final Map<String, LinkedList<InetSocketAddress>> servicesMap;
+    private final Map<String, LinkedList<Address>> servicesMap;
 
     /**
-     * 不可用的服务（无法连接服务端导致服务不可用）
+     * 某个服务提供者注册的所有服务
      */
-    private final Map<String, LinkedList<InetSocketAddress>> unavailableServicesMap;
+    private final Map<Channel, ArrayList<String>> channelServicesMap;
 
     public ServiceCenter() {
         servicesMap = new ConcurrentHashMap<>();
-        unavailableServicesMap = new ConcurrentHashMap<>();
+        channelServicesMap = new ConcurrentHashMap<>();
     }
 
     /**
      * 寻找服务
      */
-    public LinkedList<InetSocketAddress> discovery(DiscoveryDto discoveryDto) {
+    public LinkedList<Address> discovery(DiscoveryDto discoveryDto) {
         return servicesMap.get(discoveryDto.getServiceName());
     }
 
     /**
      * 注册服务
      */
-    public void register(RegisterDto registerDto) {
-        LinkedList<InetSocketAddress> addresses = servicesMap.get(registerDto.getServiceName());
+    public void register(RegisterDto registerDto, Channel channel) {
+        ArrayList<String> serviceNameList = channelServicesMap.getOrDefault(channel, new ArrayList<>());
+        serviceNameList.add(registerDto.getServiceName());
+        LinkedList<Address> addresses = servicesMap.get(registerDto.getServiceName());
         if (addresses == null) {
             addresses = new LinkedList<>();
         }
-        addresses.add(registerDto.getInetSocketAddress());
+        addresses.add(registerDto.getAddress());
         servicesMap.put(registerDto.getServiceName(), addresses);
     }
 
     /**
      * 将不可用的服务移除
      */
-    public void unavailable(String serviceName, InetSocketAddress inetSocketAddress) {
-        LinkedList<InetSocketAddress> inetSocketAddresses = servicesMap.get(serviceName);
-        inetSocketAddresses.remove(inetSocketAddress);
-        LinkedList<InetSocketAddress> unavailableAddresses = unavailableServicesMap.getOrDefault(serviceName, new LinkedList<>());
-        unavailableAddresses.add(inetSocketAddress);
+    public void unavailable(Channel channel) {
+        ArrayList<String> serviceNameList = channelServicesMap.get(channel);
+        if (serviceNameList != null) {
+            for (String serviceName : serviceNameList) {
+                servicesMap.remove(serviceName);
+            }
+        }
     }
 
-    /**
-     * 服务变可用，移出不可用队列
-     */
-    public void available(String serviceName, InetSocketAddress inetSocketAddress) {
-        LinkedList<InetSocketAddress> unavailableAddresses = unavailableServicesMap.get(serviceName);
-        if (unavailableAddresses != null) {
-            unavailableAddresses.remove(inetSocketAddress);
-        }
-        LinkedList<InetSocketAddress> inetSocketAddresses = servicesMap.get(serviceName);
-        inetSocketAddresses.remove(inetSocketAddress);
-    }
 }
