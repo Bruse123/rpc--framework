@@ -1,7 +1,9 @@
 package com.lhb.rpc.transport.netty.server;
 
+import com.lhb.rpc.enums.RpcErrorMsg;
 import com.lhb.rpc.enums.RpcResponseCode;
 import com.lhb.rpc.enums.SerializationType;
+import com.lhb.rpc.exception.RpcException;
 import com.lhb.rpc.factory.SingletonFactory;
 import com.lhb.rpc.handler.RpcRequestHandler;
 import com.lhb.rpc.transport.RpcConstants;
@@ -45,17 +47,24 @@ public class RpcServerHandler extends ChannelInboundHandlerAdapter {
                     rpcMessage.setData(RpcConstants.PONG);
                 } else {
                     Object rpcRequest = ((RpcMessage) msg).getData();
-                    Object result = rpcRequestHandler.handler((RpcRequest) rpcRequest);
-                    log.info("server get result [{}]", result);
-                    rpcMessage.setMessageType(RpcConstants.RESPONSE_TYPE);
-                    if (ctx.channel().isActive() && ctx.channel().isWritable()) {
-                        RpcResponse<Object> rpcResponse = RpcResponse.success(((RpcRequest) rpcRequest).getRequestId(), result);
+                    try {
+                        Object result = rpcRequestHandler.handler((RpcRequest) rpcRequest);
+                        log.info("server get result [{}]", result);
+                        rpcMessage.setMessageType(RpcConstants.RESPONSE_TYPE);
+                        if (ctx.channel().isActive() && ctx.channel().isWritable()) {
+                            RpcResponse<Object> rpcResponse = RpcResponse.success(((RpcRequest) rpcRequest).getRequestId(), result);
+                            rpcMessage.setData(rpcResponse);
+                        } else {
+                            RpcResponse<Object> rpcResponse = RpcResponse.fail(((RpcRequest) rpcRequest).getRequestId(), "not writable", RpcResponseCode.FALSE);
+                            rpcMessage.setData(rpcResponse);
+                            log.error("not writable now, message dropped");
+                        }
+                    } catch (RpcException e) {
+                        log.error(e.getMessage());
+                        RpcResponse<Object> rpcResponse = RpcResponse.fail(((RpcRequest) rpcRequest).getRequestId(), RpcErrorMsg.SERVICE_INVOCATION_FAILURE, RpcResponseCode.FALSE);
                         rpcMessage.setData(rpcResponse);
-                    } else {
-                        RpcResponse<Object> rpcResponse = RpcResponse.fail(((RpcRequest) rpcRequest).getRequestId(), "not writable", RpcResponseCode.FALSE);
-                        rpcMessage.setData(rpcResponse);
-                        log.error("not writable now, message dropped");
                     }
+
                 }
                 ctx.writeAndFlush(rpcMessage).addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
             }

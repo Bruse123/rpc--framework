@@ -47,6 +47,7 @@ public class RegisterCenterHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         try {
+            //只处理自定义的消息
             if (msg instanceof RpcMessage) {
                 log.info("Register Center receive msg：[{}]", msg);
                 RpcMessage message = (RpcMessage) msg;
@@ -57,6 +58,7 @@ public class RegisterCenterHandler extends ChannelInboundHandlerAdapter {
                         .build();
                 RpcResponse<Object> response = null;
                 if (messageType == RpcConstants.REGISTER_REQUEST_TYPE) {
+                    //服务注册的消息
                     RegisterDto data = (RegisterDto) message.getData();
                     serviceCenter.register(data, ctx.channel());
                     responseMessage.setMessageType(RpcConstants.REGISTER_RESPONSE_TYPE);
@@ -64,6 +66,7 @@ public class RegisterCenterHandler extends ChannelInboundHandlerAdapter {
                     //保存服务提供者的通道
                     serverChannelProvider.put(ctx.channel(), (InetSocketAddress) ctx.channel().remoteAddress());
                 } else if (messageType == RpcConstants.DISCOVERY_REQUEST_TYPE) {
+                    //客户端寻找服务的消息
                     responseMessage.setMessageType(RpcConstants.DISCOVERY_RESPONSE_TYPE);
                     DiscoveryDto data = (DiscoveryDto) message.getData();
                     LinkedList<Address> discovery = serviceCenter.discovery(data);

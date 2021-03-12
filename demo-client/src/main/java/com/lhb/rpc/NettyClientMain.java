@@ -14,7 +14,7 @@ public class NettyClientMain {
     public static void main(String[] args) throws InterruptedException {
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(NettyClientMain.class);
         HelloController helloController = (HelloController) applicationContext.getBean("helloController");
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 1; i++) {
             helloController.test();
             Thread.sleep(5000);
         }

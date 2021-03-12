@@ -1,5 +1,6 @@
 package com.lhb.rpc.handler;
 
+import com.lhb.rpc.exception.RpcException;
 import com.lhb.rpc.factory.SingletonFactory;
 import com.lhb.rpc.provider.ServiceProvider;
 import com.lhb.rpc.provider.ServiceProviderImpl;
@@ -35,8 +36,7 @@ public class RpcRequestHandler {
             result = method.invoke(service, rpcRequest.getArguments());
             log.info("service [{}] invoke method [{}]", rpcRequest.getServiceName(), method.getName());
         } catch (NoSuchMethodException | IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
-            //throw new RpcException(e);
-            log.error(e.getMessage());
+            throw new RpcException(e);
         }
         return result;
     }
